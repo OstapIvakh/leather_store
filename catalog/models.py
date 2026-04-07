@@ -4,7 +4,7 @@ from django.urls import reverse
 class Category(models.Model):
     name = models.CharField(max_length=200)
     # Slug — це те саме "людське посилання" (наприклад, 'wallets')
-    slug = models.SlugField(max_length=200, db_index=True, blank=True)
+    slug = models.SlugField(max_length=200, unique=True, null=False, blank=False)
 
     def get_absolute_url(self):
         return reverse('product_list_by_category', args=[self.id, self.slug])
