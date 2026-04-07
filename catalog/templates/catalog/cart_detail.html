@@ -1,0 +1,68 @@
+{% extends 'catalog/base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4">Your Shopping Cart</h2>
+    
+    {% if cart %}
+    <div class="row">
+        <div class="col-lg-8">
+            <table class="table align-middle">
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Price</th>
+                        <th>Quantity</th>
+                        <th>Total</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in cart %}
+                    <tr>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                {% if item.product.image %}
+                                    <img src="{{ item.product.image.url }}" style="width: 50px; height: 50px; object-fit: cover;" class="me-3 rounded">
+                                {% else %}
+                                    <div class="me-3 rounded bg-light text-center" style="width: 50px; height: 50px; font-size: 10px; line-height: 50px;">No pic</div>
+                                {% endif %}
+                                <span>{{ item.product.name }}</span>
+                            </div>
+                        </td>
+                        <td>{{ item.price }} €</td>
+                        <td>
+                            <form action="{% url 'cart_add' item.product.id %}" method="post" class="d-flex shadow-sm" style="max-width: 120px;">
+                                {% csrf_token %}
+                                <input type="number" name="quantity" value="{{ item.quantity }}" min="1" class="form-control form-control-sm text-center border-0">
+                                <input type="hidden" name="override" value="True">
+                                <button type="submit" class="btn btn-sm btn-light border-start">ok</button>
+                            </form>
+                        </td>
+                        <td>{{ item.total_price }} €</td>
+                        <td>
+                            <a href="{% url 'cart_remove' item.product.id %}" class="text-danger text-decoration-none">✕</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="col-lg-4">
+            <div class="card p-4 shadow-sm">
+                <h4>Total: <span class="text-primary">{{ cart.get_total_price }} €</span></h4>
+                <hr>
+                <a href="{% url 'order_create' %}" class="btn btn-dark w-100 btn-lg">Proceed to Checkout</a>
+                <!-- <a href="{% url 'order_create' %}">Checkout</a> -->
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="text-center py-5">
+        <h3>Your cart is empty</h3>
+        <a href="{% url 'all_products' %}" class="btn btn-outline-dark mt-3">Go to Workshop</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

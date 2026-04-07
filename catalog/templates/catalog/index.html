@@ -1,0 +1,108 @@
+{% extends 'catalog/base.html' %}
+
+{% block title %}KOROL LEATHER WORKSHOP | Головна{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Великий банер (Jumbotron) -->
+    <div class="p-5 mb-4 bg-dark text-white rounded-3">
+        <div class="container-fluid py-5 text-center">
+            <h1 class="display-4 fw-bold">KOROL LEATHER WORKSHOP</h1>
+            <p class="fs-4 italic">Handmade with Passion & Precision</p>
+            <hr class="my-4">
+            <p>Unique products from natural full-grain leather. Each stitch is a story.</p>
+            <a href="{% url 'all_products' %}" class="btn btn-outline-light btn-lg">View all products</a>
+        </div>
+    </div>
+
+    <!-- Блок з перевагами -->
+    <div class="row g-4 py-5 row-cols-1 row-cols-lg-3 text-center">
+        <div class="feature col">
+            <div class="feature-icon d-inline-flex align-items-center justify-content-center fs-2 mb-3">
+                🧵
+            </div>
+            <h3 class="fs-2 text-body-emphasis">Handcrafted</h3>
+            <p>We don't use machines. Only hand-sewn stitches that will never come undone.</p>
+        </div>
+        <div class="feature col">
+            <div class="feature-icon d-inline-flex align-items-center justify-content-center fs-2 mb-3">
+                🐂
+            </div>
+            <h3 class="fs-2 text-body-emphasis">High Quality Leather</h3>
+            <p>We use premium full-grain leather and traditional techniques to ensure your accessories age beautifully over time.</p>
+        </div>
+        <div class="feature col">
+            <div class="feature-icon d-inline-flex align-items-center justify-content-center fs-2 mb-3">
+                🎁
+            </div>
+            <h3 class="fs-2 text-body-emphasis">Individuality</h3>
+            <p>Each product has its own character. Personalization is possible.</p>
+        </div>
+    </div>
+</div>
+
+<section id="about" class="py-5 bg-white">
+    <div class="container">
+        <div class="row align-items-center mb-5">
+            <div class="col-md-6 mb-4 mb-md-0">
+                <h2 class="display-5 fw-bold mb-4 text-uppercase" style="letter-spacing: 2px;">The Art of Craft</h2>
+                <p class="lead text-muted">Every Korol Leather piece is a blend of tradition and timeless style.</p>
+                <p>I believe that accessories should be more than just functional — they should have a soul. That's why I use only <strong>Full Grain Leather</strong> and the traditional saddle stitch technique that will never unravel.</p>
+                <p>My philosophy is "Slow Fashion": creating goods that don't just last, but get better with age, developing a unique patina that tells your story.</p>
+            </div>
+            <div class="col-md-6">
+                <div class="rounded shadow-lg overflow-hidden" style="height: 400px; background: #f8f9fa url('/static/images/workshop_main.jpg') center/cover no-repeat;">
+                    {% if not workshop_photo %}
+                        <div class="h-100 d-flex align-items-center justify-content-center text-muted fst-italic">
+                            [Upload your workshop photo to /static/images/]
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="row text-center g-4 mt-4">
+            <div class="col-md-4">
+                <div class="p-3">
+                    <i class="bi bi-hand-index-thumb fs-1 mb-3 text-dark"></i>
+                    <h5 class="fw-bold text-uppercase">100% Handcrafted</h5>
+                    <p class="small text-muted">From the first cut to the final edge polishing — everything is done by hand in my workshop.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="p-3">
+                    <i class="bi bi-gem fs-1 mb-3 text-dark"></i>
+                    <h5 class="fw-bold text-uppercase">Premium Materials</h5>
+                    <p class="small text-muted">Only the finest Italian and local vegetable-tanned leathers are selected for production.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="p-3">
+                    <i class="bi bi-shield-check fs-1 mb-3 text-dark"></i>
+                    <h5 class="fw-bold text-uppercase">Lifetime Warranty</h5>
+                    <p class="small text-muted">I stand behind every stitch. Enjoy a lifetime warranty on the integrity of the seams.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="contact" class="py-5">
+    <div class="container text-center">
+        <h2 class="mb-4">Get in Touch</h2>
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <p>Have questions or want a custom order? Contact us via:</p>
+                <div class="d-flex justify-content-around mt-4">
+                    <a href="mailto:shop@korol-leather.com" class="btn btn-outline-dark">Email Us</a>
+                    <a href="https://www.instagram.com/korol_handmade" class="btn btn-outline-dark">Instagram</a>
+                    <a href="https://t.me/your_username" class="btn btn-outline-dark">Telegram</a>
+                    <a href="https://korolhandmade.etsy.com" class="btn btn-outline-dark">Etsy</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}
+

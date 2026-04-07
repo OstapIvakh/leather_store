@@ -1,0 +1,67 @@
+"""
+URL configuration for config project.
+
+The `urlpatterns` list routes URLs to views. For more information please see:
+    https://docs.djangoproject.com/en/6.0/topics/http/urls/
+Examples:
+Function views
+    1. Add an import:  from my_app import views
+    2. Add a URL to urlpatterns:  path('', views.home, name='home')
+Class-based views
+    1. Add an import:  from other_app.views import Home
+    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
+Including another URLconf
+    1. Import the include() function: from django.urls import include, path
+    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
+"""
+from django.contrib import admin
+from django.urls import path
+from django.conf import settings
+from django.conf.urls.static import static
+from catalog.views import all_products, product_detail, index # Імпортуємо нашу функцію всіх товарів і детального перегляду
+from catalog import views
+
+# urlpatterns = [
+#     path('admin/', admin.site.urls),
+#     path('', index, name='home'), # Порожні лапки '' означають головну сторінку
+#     path('catalog/', views.all_products, name='all_products'),
+#     # Додаємо маршрут для перегляду товарів за категорією
+#     path('category/<int:category_id>/<slug:category_slug>/', views.category_products, name='category_products'),
+#     # Додаємо маршрут для детального перегляду товару 
+#     path('product/<int:pk>/<slug:product_slug>/', product_detail, name='product_detail'),
+#     # Додаємо маршрути для кошика
+#     path('cart/', views.cart_detail, name='cart_detail'),
+#     path('cart/add/<int:product_id>/<slug:product_slug>/', views.cart_add, name='cart_add'),
+#     path('cart/remove/<int:product_id>/<slug:product_slug>/', views.cart_remove, name='cart_remove'),
+#     path('create/', views.order_create, name='order_create'),
+#     # Додаємо маршрут для перегляду товарів за категорією
+#     path('catalog/', views.all_products, name='all_products'),
+#     path('catalog/<int:category_id>/<slug:category_slug>/', views.all_products, name='product_list_by_category'),
+#     ]
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('', index, name='home'),
+    
+    # КАТАЛОГ ТА ФІЛЬТРАЦІЯ
+    path('catalog/', views.all_products, name='all_products'),
+    # Використовуємо тільки slug для категорій (це простіше і красивіше)
+    path('catalog/<slug:category_slug>/', views.all_products, name='product_list_by_category'),
+    
+    # ТОВАР
+    # Додаємо slug до товару для SEO
+    path('product/<int:pk>/<slug:product_slug>/', views.product_detail, name='product_detail'),
+    
+    # КОШИК
+    path('cart/', views.cart_detail, name='cart_detail'),
+    path('cart/add/<int:product_id>/', views.cart_add, name='cart_add'), # Тут slug не обов'язковий, але можна лишити
+    path('cart/remove/<int:product_id>/', views.cart_remove, name='cart_remove'),
+    
+    # ЗАМОВЛЕННЯ
+    path('order/create/', views.order_create, name='order_create'),
+]
+
+# Цей рядок дозволяє Django показувати картинки в браузері під час розробки:
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    
