@@ -14,5 +14,3 @@ python manage.py collectstatic --no-input
 
 # Запускаємо міграції
 python manage.py migrate
-
-python create_admin.py
