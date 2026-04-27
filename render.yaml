@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: korol-leather
+    env: python
+    buildCommand: "./build.sh"
+    startCommand: "gunicorn leather_store.wsgi:application"
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      - key: DJANGO_SETTINGS_MODULE
+        value: leather_store.settings
