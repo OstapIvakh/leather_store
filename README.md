@@ -14,8 +14,17 @@ Features
 🚀 Deployed on Render with Gunicorn and static files via WhiteNoise
 
 
-Tech Stack
-LayerTechnologyBackendPython 3, DjangoDatabasePostgreSQL (production), SQLite (development)ServerGunicornStatic filesWhiteNoiseNotificationsTelegram Bot APIEmailDjango email backend (SMTP)DeploymentRender
+## Tech Stack
+
+| Layer | Technology |
+| --- | --- |
+| Backend | Python 3, Django |
+| Database | PostgreSQL (production), SQLite (development) |
+| Server | Gunicorn |
+| Static files | WhiteNoise |
+| Notifications | Telegram Bot API |
+| Email | Django email backend (SMTP) |
+| Deployment | Render |
 
 Project Structure
 leather_store/
@@ -66,5 +75,5 @@ EMAIL_HOST_PASSWORD=your-email-password
 DEFAULT_FROM_EMAIL=your-email@example.com
 
 Author
-Ostap Ivakh — Junior Python Developer
+Ostap Ivakh
 GitHub
