@@ -23,7 +23,7 @@ from catalog import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', index, name='home'),
+    path('', views.index, name='home'),
     
     # КАТАЛОГ ТА ФІЛЬТРАЦІЯ
     path('catalog/', views.all_products, name='all_products'),
