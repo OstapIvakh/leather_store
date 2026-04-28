@@ -5,8 +5,9 @@ from .forms import OrderCreateForm, ProductFilterForm
 from .cart import Cart
 from .utils import send_telegram_message
 from django.core.mail import send_mail
-from config.settings import DEFAULT_FROM_EMAIL
+from django.conf import settings
 from django.core.paginator import Paginator
+from django.db.models import Q
 
 def index(request):
     # Головна сторінка, поки показуємо тільки останні 3 товари
@@ -38,7 +39,6 @@ def all_products(request, category_slug=None):
     query = request.GET.get('search')
     if query:
         # Шукаємо одночасно в назві АБО в описі
-        from django.db.models import Q
         products = products.filter(
             Q(name__icontains=query) | Q(description__icontains=query)
         )
@@ -92,20 +92,7 @@ def product_detail(request, pk, product_slug):
     product = get_object_or_404(Product, id=pk, slug=product_slug, is_available=True)
     # Відправляємо товар у "шаблон" (HTML-файл) 
     return render(request, 'catalog/product_detail.html', {'product': product})
-
-
-def category_products(request, category_id):
-    # 1. Шукаємо категорію в базі. Якщо її немає (хтось ввів кривий ID) — видаємо помилку 404.
-    category = get_object_or_404(Category, id=category_id)
     
-    # 2. Фільтруємо товари: дай мені тільки ті, де поле 'category' збігається з нашою.
-    products = Product.objects.filter(category=category, is_available=True).order_by('-created_at')
-    
-    # 3. Відправляємо результат у той самий шаблон, який ми вже маємо.
-    return render(request, 'catalog/product_list.html', {
-        'products': products,
-        'current_category': category # передаємо категорію, щоб написати заголовок
-    })
 
 @require_POST
 def cart_add(request, product_id):
@@ -161,7 +148,7 @@ def order_create(request):
                 )
                 items_text += f" - {item['product'].name} x {item['quantity']}\n"
 
-            # Складаємо фінальний текст для Telegram
+            # Фінальний текст повідомлення про нове замовлення в Telegram
             tg_message = (
                 f"<b>🚀 New Order #{order.id}</b>\n\n"
                 f"<b>Customer:</b> {order.first_name} {order.last_name}\n"
@@ -173,17 +160,8 @@ def order_create(request):
             )
             
             send_telegram_message(tg_message)
-            
-            # 3. Переносимо товари з кошика в базу (в OrderItem)
-            for item in cart:
-                OrderItem.objects.create(
-                    order=order,
-                    product=item['product'],
-                    price=item['price'],
-                    quantity=item['quantity']
-                )
 
-            # 3.1 Відправляємо електронну пошту з інформацією про замовлення
+            # 3 Відправляємо електронну пошту з інформацією про замовлення
             subject = f'Order #{order.id} Connfirmation'
             message = (
                 f'Dear {order.first_name}!\n\n'
@@ -196,7 +174,7 @@ def order_create(request):
             send_mail(
                 subject,
                 message,
-                DEFAULT_FROM_EMAIL,
+                settings.DEFAULT_FROM_EMAIL,
                 [order.email],
                 fail_silently=False,
             )

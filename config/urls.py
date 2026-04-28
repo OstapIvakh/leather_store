@@ -18,26 +18,8 @@ from django.contrib import admin
 from django.urls import path
 from django.conf import settings
 from django.conf.urls.static import static
-from catalog.views import all_products, product_detail, index # Імпортуємо нашу функцію всіх товарів і детального перегляду
 from catalog import views
 
-# urlpatterns = [
-#     path('admin/', admin.site.urls),
-#     path('', index, name='home'), # Порожні лапки '' означають головну сторінку
-#     path('catalog/', views.all_products, name='all_products'),
-#     # Додаємо маршрут для перегляду товарів за категорією
-#     path('category/<int:category_id>/<slug:category_slug>/', views.category_products, name='category_products'),
-#     # Додаємо маршрут для детального перегляду товару 
-#     path('product/<int:pk>/<slug:product_slug>/', product_detail, name='product_detail'),
-#     # Додаємо маршрути для кошика
-#     path('cart/', views.cart_detail, name='cart_detail'),
-#     path('cart/add/<int:product_id>/<slug:product_slug>/', views.cart_add, name='cart_add'),
-#     path('cart/remove/<int:product_id>/<slug:product_slug>/', views.cart_remove, name='cart_remove'),
-#     path('create/', views.order_create, name='order_create'),
-#     # Додаємо маршрут для перегляду товарів за категорією
-#     path('catalog/', views.all_products, name='all_products'),
-#     path('catalog/<int:category_id>/<slug:category_slug>/', views.all_products, name='product_list_by_category'),
-#     ]
 
 urlpatterns = [
     path('admin/', admin.site.urls),
