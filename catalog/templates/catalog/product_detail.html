@@ -82,13 +82,13 @@
 <style>
     .thumb-img {
         transition: all 0.2s;
-        border: 2px solid transparent; /* Завжди тримаємо рамку, щоб картинка не "стрибала" при появі межі */
+        border: 2px solid transparent; /* Keep a border so the image doesn't "jump" when the border appears */
     }
     .thumb-img:hover {
         border-color: #000;
         opacity: 0.8;
     }
-    /* Клас для підсвітки обраного фото */
+    /* Class used to highlight the selected photo */
     .active-thumb {
         border-color: #000 !important;
         opacity: 1 !important;
@@ -97,16 +97,16 @@
 
 <script>
 function changeMainImage(element) {
-    // 1. Замінюємо джерело (src) головного зображення на src натиснутої мініатюри
+    // 1. Replace the main image src with the clicked thumbnail src
     document.getElementById('mainImage').src = element.src;
 
-    // 2. Знаходимо всі мініатюри в галереї
+    // 2. Find all thumbnails in the gallery
     let thumbnails = document.querySelectorAll('.thumb-img');
 
-    // 3. Видаляємо клас активності (чорну рамку) у всіх мініатюр
+    // 3. Remove the active class (black border) from all thumbnails
     thumbnails.forEach(img => img.classList.remove('active-thumb'));
 
-    // 4. Додаємо клас активності саме тому елементу, на який натиснули
+    // 4. Add the active class to the clicked thumbnail
     element.classList.add('active-thumb');
 }
 </script>

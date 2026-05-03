@@ -1,4 +1,4 @@
-from django.shortcuts import render, get_object_or_404, redirect  
+from django.shortcuts import render, get_object_or_404, redirect
 from django.views.decorators.http import require_POST
 from .models import Product, Category, OrderItem
 from .forms import OrderCreateForm, ProductFilterForm
@@ -9,45 +9,49 @@ from django.conf import settings
 from django.core.paginator import Paginator
 from django.db.models import Q
 
+
 def index(request):
-    # Головна сторінка, поки показуємо тільки останні 3 товари
-    latest_products = Product.objects.filter(is_available=True).order_by('-created_at')[:3]
-    return render(request, 'catalog/index.html', {'latest_products': latest_products})
+    # Homepage: for now, show only the latest 3 products.
+    latest_products = Product.objects.filter(is_available=True).order_by("-created_at")[
+        :3
+    ]
+    return render(request, "catalog/index.html", {"latest_products": latest_products})
+
 
 def all_products(request, category_slug=None):
-    # беремо "брудні" дані з URL.
+    # Read raw query params from the URL.
     form = ProductFilterForm(request.GET)
 
-    # Ініціалізуємо змінні заздалегідь
+    # Initialize variables upfront.
     min_price = None
     max_price = None
 
-    # Django перевіряє, чи там цифри, і чи вони не від'ємні.
+    # Django validates that values are numeric and non-negative.
     if form.is_valid():
-        # Записуємо чисті данні у змінні
-        min_price = form.cleaned_data.get('min_price') 
-        max_price = form.cleaned_data.get('max_price')
+        # Store cleaned values.
+        min_price = form.cleaned_data.get("min_price")
+        max_price = form.cleaned_data.get("max_price")
 
     category = None
-    #Вибираємо всі категорії з бази даних
+    # Fetch all categories from the database.
     categories = Category.objects.all()
-    #Вибираємо всі товари з бази даних
+    # Fetch all available products from the database.
     products = Product.objects.filter(is_available=True)
-    #Якщо є категорія, то вибираємо тільки ті товари, які належать до цієї категорії
-    
-    # Отримуємо запит із пошукового рядка (назвемо параметр 'query')
-    query = request.GET.get('search')
+    # If a category is provided, filter products by that category.
+
+    # Get the search query from the search field.
+    query = request.GET.get("search")
     if query:
-        # Шукаємо одночасно в назві АБО в описі
+        # Search in name OR description.
         products = products.filter(
             Q(name__icontains=query) | Q(description__icontains=query)
         )
 
-    #Якщо немає категорії, то вибираємо всі товари
+    # If no category is provided, keep the full product list.
     if category_slug:
-        #Вибираємо категорію за її slug
+        # Look up the category by slug.
         category = get_object_or_404(Category, slug=category_slug)
-        #Вибираємо тільки ті товари, які належать до цієї категорії
+        # Filter products by the selected category.
         products = products.filter(category=category)
 
     if min_price:
@@ -55,100 +59,108 @@ def all_products(request, category_slug=None):
     if max_price:
         products = products.filter(price__lte=max_price)
 
-    # Отримуємо параметр сортування
-    sort = request.GET.get('sort')
+    # Sorting.
+    sort = request.GET.get("sort")
 
-    if sort == 'price_asc':
-        products = products.order_by('price') # Від дешевих
-    elif sort == 'price_desc':
-        products = products.order_by('-price') # Від дорогих
-    elif sort == 'newest':
-        products = products.order_by('-created_at') # Новинки
+    if sort == "price_asc":
+        products = products.order_by("price")  # Lowest price first
+    elif sort == "price_desc":
+        products = products.order_by("-price")  # Highest price first
+    elif sort == "newest":
+        products = products.order_by("-created_at")  # Newest first
     else:
-        products = products.order_by('name') # За замовчуванням (алфавіт)
-        
+        products = products.order_by("name")  # Default (alphabetical)
 
-    # Створюємо об'єкт пагінатора. 
-    # Другий аргумент — це кількість товарів на сторінці (давай поставимо 6 для тесту).
+    # Create a paginator.
+    # The second argument is items per page.
     paginator = Paginator(products, 3)
 
-    # Отримуємо номер поточної сторінки з URL (наприклад, ?page=2)
-    page_number = request.GET.get('page')
+    # Current page number from the URL (e.g., ?page=2).
+    page_number = request.GET.get("page")
 
-    # Отримуємо об'єкт сторінки з товарами саме для цього номера
+    # Page object for the requested page.
     page_obj = paginator.get_page(page_number)
-        
 
-    #Відправляємо результат у шаблон
-    return render(request, 'catalog/product_list.html', {
-        'category': category, #Передаємо категорію, щоб написати заголовок
-        'categories': categories, #Передаємо всі категорії, щоб показати в меню
-        'products': page_obj, #Tепер у шаблон замість 'products' передаємо 'page_obj 
-        'form': form,  # Передаємо форму фільтрації для використання у шаблоні
-        })
+    # Render results.
+    return render(
+        request,
+        "catalog/product_list.html",
+        {
+            "category": category,  # Used by the template for the page heading
+            "categories": categories,  # Used to render the menu
+            "products": page_obj,  # Pass a Page object instead of a full queryset
+            "form": form,  # Filter form for the template
+        },
+    )
+
 
 def product_detail(request, pk, product_slug):
-    # Шукаємо товар за його ID та slug. Якщо не знайдемо — покажемо помилку 404
+    # Look up the product by ID and slug; raise 404 if not found.
     product = get_object_or_404(Product, id=pk, slug=product_slug, is_available=True)
-    # Відправляємо товар у "шаблон" (HTML-файл) 
-    return render(request, 'catalog/product_detail.html', {'product': product})
-    
+    # Render the product detail template.
+    return render(request, "catalog/product_detail.html", {"product": product})
+
 
 @require_POST
 def cart_add(request, product_id):
     cart = Cart(request)
     product = get_object_or_404(Product, id=product_id)
-    # Отримуємо кількість з форми, якщо її немає — за замовчуванням 1   
-    quantity = int(request.POST.get('quantity', 1))
+    # Quantity from the form; default to 1.
+    quantity = int(request.POST.get("quantity", 1))
 
-    # Перевіряємо, чи прийшов запит на перезапис (з кошика)
-    override = request.POST.get('override') == 'True'
+    # Check whether the request asks to override quantity (from the cart page).
+    override = request.POST.get("override") == "True"
 
     cart.add(product=product, quantity=quantity, override_quantity=override)
 
-    # Перевіряємо, чи була натиснута кнопка "Buy Now"
-    if request.POST.get('buy_now'):
-        return redirect('cart_detail') # Поки шлемо в кошик, пізніше — на оплату
-    
-    # Якщо просто "Add to Cart", повертаємо на ту ж сторінку, де був юзер
-    return redirect(request.META.get('HTTP_REFERER', 'all_products'))
+    # Check if the user clicked "Buy Now".
+    if request.POST.get("buy_now"):
+        return redirect(
+            "cart_detail"
+        )  # For now redirect to cart; later this could go to checkout
+
+    # For a regular "Add to Cart", return the user to the page they were on.
+    return redirect(request.META.get("HTTP_REFERER", "all_products"))
+
 
 def cart_remove(request, product_id):
     cart = Cart(request)
     product = get_object_or_404(Product, id=product_id)
     cart.remove(product)
-    return redirect('cart_detail')
+    return redirect("cart_detail")
+
 
 def cart_detail(request):
     cart = Cart(request)
-    return render(request, 'catalog/cart_detail.html', {'cart': cart})
+    return render(request, "catalog/cart_detail.html", {"cart": cart})
+
 
 def order_create(request):
-    cart = Cart(request) # Спочатку ініціалізуємо кошик
+    cart = Cart(request)  # Initialize cart first
 
-    # Якщо кошик порожній, не пускаємо на сторінку оформлення
+    # If the cart is empty, do not allow checkout.
     if len(cart) == 0:
-        return redirect('all_products')
+        return redirect("all_products")
 
-    if request.method == 'POST':
-        # 1. Якщо юзер натиснув "Оформити", наповнюємо форму даними з запиту
+    if request.method == "POST":
+        # 1. If the user submitted the form, populate it with POST data.
         form = OrderCreateForm(request.POST)
         if form.is_valid():
-            # 2. Зберігаємо "шапку" замовлення в базу (створюємо об'єкт Order)
+            # 2. Save the order header to the DB (create an Order instance).
             order = form.save()
 
-            # Формуємо текст повідомлення для себе 
+            # Build a message body for internal notifications.
             items_text = ""
             for item in cart:
                 OrderItem.objects.create(
                     order=order,
-                    product=item['product'],
-                    price=item['price'],
-                    quantity=item['quantity']
+                    product=item["product"],
+                    price=item["price"],
+                    quantity=item["quantity"],
                 )
                 items_text += f" - {item['product'].name} x {item['quantity']}\n"
 
-            # Фінальний текст повідомлення про нове замовлення в Telegram
+            # Final Telegram message for the new order.
             tg_message = (
                 f"<b>🚀 New Order #{order.id}</b>\n\n"
                 f"<b>Customer:</b> {order.first_name} {order.last_name}\n"
@@ -158,19 +170,19 @@ def order_create(request):
                 f"<b>Items:</b>\n{items_text}\n"
                 f"<b>Total:</b> {cart.get_total_price()}€"
             )
-            
+
             send_telegram_message(tg_message)
 
-            # 3 Відправляємо електронну пошту з інформацією про замовлення
-            subject = f'Order #{order.id} Connfirmation'
+            # 3. Send an email with order information.
+            subject = f"Order #{order.id} Connfirmation"
             message = (
-                f'Dear {order.first_name}!\n\n'
-                f'Thank you for your order! Your order ID is {order.id}.\n\n'
-                f'We will contact you soon to confirm the order details.\n\n'
-                f'Best regards,\n'
-                f'Korol Leather Workshop\n'
-                f'https://korol-leather.com\n'
-                )
+                f"Dear {order.first_name}!\n\n"
+                f"Thank you for your order! Your order ID is {order.id}.\n\n"
+                f"We will contact you soon to confirm the order details.\n\n"
+                f"Best regards,\n"
+                f"Korol Leather Workshop\n"
+                f"https://korol-leather.com\n"
+            )
             send_mail(
                 subject,
                 message,
@@ -178,15 +190,14 @@ def order_create(request):
                 [order.email],
                 fail_silently=False,
             )
-            
-            
-            # 4. Очищаємо кошик після успішного замовлення
+
+            # 4. Clear the cart after a successful order.
             cart.clear()
-            
-            # 5. Показуємо сторінку "Дякуємо за замовлення!"
-            return render(request, 'catalog/order_created.html', {'order': order})
+
+            # 5. Render the "Thank you for your order" page.
+            return render(request, "catalog/order_created.html", {"order": order})
     else:
-        # 6. Якщо юзер просто зайшов на сторінку — показуємо йому порожню форму
+        # 6. If the user just opened the page, show an empty form.
         form = OrderCreateForm()
-    
-    return render(request, 'catalog/order_create.html', {'cart': cart, 'form': form})
+
+    return render(request, "catalog/order_create.html", {"cart": cart, "form": form})

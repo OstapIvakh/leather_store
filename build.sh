@@ -2,15 +2,15 @@
 # exit on error
 set -o errexit
 
-# Оновлюємо pip і встановлюємо залежності
+# Upgrade pip and install dependencies
 python -m pip install --upgrade pip
 pip install -r requirements.txt
 
-# Створюємо папку static, якщо її немає, щоб Django не сварився
+# Create the static directory if missing (so Django doesn't complain)
 mkdir -p static
 
-# Збираємо статичні файли
+# Collect static files
 python manage.py collectstatic --no-input
 
-# Запускаємо міграції
+# Run migrations
 python manage.py migrate

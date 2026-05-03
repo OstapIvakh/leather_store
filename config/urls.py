@@ -14,6 +14,7 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+
 from django.contrib import admin
 from django.urls import path
 from django.conf import settings
@@ -22,28 +23,33 @@ from catalog import views
 
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('', views.index, name='home'),
-    
-    # КАТАЛОГ ТА ФІЛЬТРАЦІЯ
-    path('catalog/', views.all_products, name='all_products'),
-    # Використовуємо тільки slug для категорій (це простіше і красивіше)
-    path('catalog/<slug:category_slug>/', views.all_products, name='product_list_by_category'),
-    
-    # ТОВАР
-    # Додаємо slug до товару для SEO
-    path('product/<int:pk>/<slug:product_slug>/', views.product_detail, name='product_detail'),
-    
-    # КОШИК
-    path('cart/', views.cart_detail, name='cart_detail'),
-    path('cart/add/<int:product_id>/', views.cart_add, name='cart_add'), # Тут slug не обов'язковий, але можна лишити
-    path('cart/remove/<int:product_id>/', views.cart_remove, name='cart_remove'),
-    
-    # ЗАМОВЛЕННЯ
-    path('order/create/', views.order_create, name='order_create'),
+    path("admin/", admin.site.urls),
+    path("", views.index, name="home"),
+    # CATALOG AND FILTERING
+    path("catalog/", views.all_products, name="all_products"),
+    # Use only the category slug (simpler and nicer URLs)
+    path(
+        "catalog/<slug:category_slug>/",
+        views.all_products,
+        name="product_list_by_category",
+    ),
+    # PRODUCT
+    # Include slug in product URLs for SEO
+    path(
+        "product/<int:pk>/<slug:product_slug>/",
+        views.product_detail,
+        name="product_detail",
+    ),
+    # CART
+    path("cart/", views.cart_detail, name="cart_detail"),
+    path(
+        "cart/add/<int:product_id>/", views.cart_add, name="cart_add"
+    ),  # slug is optional here, but can be kept
+    path("cart/remove/<int:product_id>/", views.cart_remove, name="cart_remove"),
+    # ORDERS
+    path("order/create/", views.order_create, name="order_create"),
 ]
 
-# Цей рядок дозволяє Django показувати картинки в браузері під час розробки:
+# This allows Django to serve uploaded media files during development:
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-    

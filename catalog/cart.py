@@ -2,9 +2,10 @@ from decimal import Decimal
 from django.conf import settings
 from .models import Product
 
+
 class Cart:
-    # Спрацьовує щоразу, коли ми звертаємося до кошика. 
-    # Вона перевіряє: "У цього юзера вже є кошик у сесії? Якщо ні — створюю порожній словник {}"
+    # Runs every time the cart is accessed.
+    # Checks whether the user already has a cart in the session; if not, creates an empty dict {}.
     def __init__(self, request):
         self.session = request.session
         cart = self.session.get(settings.CART_SESSION_ID)
@@ -13,22 +14,22 @@ class Cart:
         self.cart = cart
 
     def add(self, product, quantity=1, override_quantity=False):
-        # Це найважливіша частина для шаблону. Вона дозволяє нам написати в HTML {% for item in cart %}. 
-        # Вона бере ID товарів з пам'яті, іде в базу даних, дістає об'єкти Product (з фото та назвами) і 
-        # "склеює" їх з кількістю та ціною.
+        # This is the key part for templates: it enables {% for item in cart %}.
+        # It takes product IDs from the session, fetches Product objects from the DB (with images/names),
+        # and combines them with quantity and price data.
         product_id = str(product.id)
         if product_id not in self.cart:
-            self.cart[product_id] = {'quantity': 0, 'price': str(product.price)}
-        
+            self.cart[product_id] = {"quantity": 0, "price": str(product.price)}
+
         if override_quantity:
-            self.cart[product_id]['quantity'] = quantity
+            self.cart[product_id]["quantity"] = quantity
         else:
-            self.cart[product_id]['quantity'] += quantity
+            self.cart[product_id]["quantity"] += quantity
         self.save()
 
     def save(self):
-        # ця функ каже Django: "Агов, дані в сесії змінилися, збережи їх у базу сесій!". 
-        # Без цього товари будуть зникати при переході на іншу сторінку.
+        # Tells Django that session data has changed and must be persisted.
+        # Without this, cart items may disappear when navigating to another page.
         self.session.modified = True
 
     def remove(self, product):
@@ -42,20 +43,22 @@ class Cart:
         products = Product.objects.filter(id__in=product_ids)
         cart = self.cart.copy()
         for product in products:
-            cart[str(product.id)]['product'] = product
+            cart[str(product.id)]["product"] = product
 
         for item in cart.values():
-            item['price'] = Decimal(item['price'])
-            item['total_price'] = item['price'] * item['quantity']
+            item["price"] = Decimal(item["price"])
+            item["total_price"] = item["price"] * item["quantity"]
             yield item
 
     def get_total_price(self):
-        return sum(Decimal(item['price']) * item['quantity'] for item in self.cart.values())
+        return sum(
+            Decimal(item["price"]) * item["quantity"] for item in self.cart.values()
+        )
 
     def clear(self):
         del self.session[settings.CART_SESSION_ID]
         self.save()
 
     def __len__(self):
-        # Рахуємо загальну кількість товарів у кошику.
-        return sum(item['quantity'] for item in self.cart.values())
+        # Returns the total number of items in the cart.
+        return sum(item["quantity"] for item in self.cart.values())

@@ -9,18 +9,18 @@
 </head>
 <body class="bg-light">
 
-    <!-- Спільне меню для всіх сторінок -->
+    <!-- Shared navigation for all pages -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
         <div class="container">
-            <!-- Назва бренду -->
+            <!-- Brand name -->
             <a class="navbar-brand" href="{% url 'home' %}">KOROL LEATHER WORKSHOP</a>
             
-            <!-- Кнопка для мобільних пристроїв (гамбургер) -->
+            <!-- Mobile toggle button (hamburger) -->
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
     
-            <!-- Саме меню з посиланнями -->
+            <!-- Navigation links -->
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
@@ -36,15 +36,6 @@
                     {% endfor %}
                 </ul>
 
-                <!-- пошук -->
-                <!-- <form class="d-flex ms-auto" action="{% url 'all_products' %}" method="get">
-                    <div class="input-group input-group-sm">
-                        <input class="form-control" type="search" name="search" placeholder="Search products..." aria-label="Search" value="{{ request.GET.search }}">
-                        <button class="btn btn-outline-light" type="submit">
-                            <i class="bi bi-search"></i>
-                        </button>
-                    </div>
-                </form> -->
                 <form class="d-flex ms-auto" action="{% url 'all_products' %}" method="get" style="max-width: 300px;">
                     <div class="input-group input-group-sm custom-search">
                         <input class="form-control border-secondary border-end-0 shadow-none" 
@@ -60,10 +51,10 @@
                 
                 <style>
                     .custom-search .form-control:focus {
-                        border-color: #6c757d; /* колір рамки при кліку */
+                        border-color: #6c757d; /* border color on focus */
                     }
                     .custom-search .btn:hover i {
-                        color: #000 !important; /* іконка темніє при наведенні */
+                        color: #000 !important; /* darken the icon on hover */
                     }
                 </style>
 
@@ -96,7 +87,7 @@
     </nav>
 
     <main class="container">
-        <!-- Сюди буде вставлятися контент з інших файлів -->
+        <!-- Content from child templates is inserted here -->
         {% block content %}
         {% endblock %}
     </main>

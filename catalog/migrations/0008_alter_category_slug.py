@@ -4,16 +4,15 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('catalog', '0007_product_slug_alter_category_slug'),
+        ("catalog", "0007_product_slug_alter_category_slug"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='category',
-            name='slug',
-            field=models.SlugField(default='temp', max_length=200, unique=True),
+            model_name="category",
+            name="slug",
+            field=models.SlugField(default="temp", max_length=200, unique=True),
             preserve_default=False,
         ),
     ]
